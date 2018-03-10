@@ -1,0 +1,39 @@
+[core]
+	editor = /usr/bin/vim
+[user]
+	email = jgibbons@linkedin.com
+	name = John Gibbons
+
+[push]
+# for the commands below to work you need to change default to upstream
+# upstream means push to the remote tracking branch instead of remote branch
+# of the same name
+default = upstream
+
+[alias]
+  # git createbranch <branchname>
+  # creates a new branch will track remotely to origin/master
+  createbranch = "!f() { \
+    if [[ -z $(git status -s) ]]; then\
+      git checkout master && mint update && git checkout -b "$1" origin/master;\
+    else\
+      echo "You have uncommitted stuff!";\
+      exit 1;\
+    fi;\
+  }; f"
+
+  git = !exec git
+  cb = "!f() { git checkout -b "$1" && git branch -u origin/master; }; f"
+  cbi = "!f() { git checkout -b "$1" && git branch -u origin/master; && just init --clean; }; f"
+  submitrb = "!f() { git review dcommit -r "$1" && git submit --async; }; f"
+
+  # git amend <rb_id>
+  # note this is probably useful for atomic bug fix and not huge features
+  # amend current changes to last commit (something like squashing commits) and
+  # retaining the last commit message then updates the RB
+  #
+  amend = "!f() { npm run lint && git add . && git commit --amend --no-edit && git review update -r "$1"; }; f"
+
+  # git finalize <rb_id>
+  # updates your master to latest, decorates the commit and tries to push
+  finalize = "!f() { npm run lint && mint update && git review dcommit -r "$1" && git submit --async; }; f"
