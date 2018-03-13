@@ -10,6 +10,48 @@ runtime macros/matchit.vim
 
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+
+" The following are examples of different formats supported.
+Plugin 'ajh17/Spacegray.vim'
+
+Plugin 'kana/vim-textobj-user'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'Raimondi/delimitMate'
+Plugin 'PeterRincker/vim-argumentative'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'mileszs/ack.vim'
+Plugin 'elzr/vim-json'
+Plugin 'ternjs/tern_for_vim'
+Plugin 'pangloss/vim-javascript'
+Plugin 'tpope/vim-sensible'
+Plugin 'jelera/vim-javascript-syntax'
+Plugin 'mxw/vim-jsx'
+Plugin 'vim-scripts/closetag.vim'
+Plugin 'editorconfig/editorconfig-vim'
+Plugin 'kchmck/vim-coffee-script'
+Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-surround'
+Plugin 'SirVer/ultisnips'
+Plugin 'johngibbons/vim-react-es6-snippets'
+Plugin 'ervandew/supertab'
+Plugin 'thoughtbot/vim-rspec'
+Plugin 'nelstrom/vim-textobj-rubyblock'
+Plugin 'w0rp/ale'
+
+autocmd bufwritepost *.js silent !standard --fix %
+set autoread
+
+" Keep Plugin commands between vundle#begin/end.
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
 filetype plugin indent on    " required
  
 " Enable syntax highlighting
@@ -83,6 +125,8 @@ if executable('ag')
   let g:ctrlp_use_caching = 0
 endif
 
+
+colorscheme spacegray
 
 augroup vimrcEx
   autocmd!
@@ -161,6 +205,9 @@ set complete+=kspell
 
 " Always use vertical diffs
 set diffopt+=vertical
+
+" Allow for expansion of carriage returns (such as within brackets)
+imap <expr> <CR> pumvisible() ? "\<c-y>" : "<Plug>delimitMateCR"
 
 " Run this file
 map <Leader>t :call RunCurrentSpecFile()<CR>
