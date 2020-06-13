@@ -56,6 +56,11 @@ ZSH_THEME="robbyrussell"
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
+export PATH="/usr/local/opt/openssl/bin:$PATH"
+
+source "$HOME/.homesick/repos/homeshick/homeshick.sh"
+homeshick --quiet refresh
+
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
@@ -103,37 +108,60 @@ export PATH="~/Documents/tools/sbt/bin:$PATH"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+# OLD - Deprecated
+# alias syncup='rsync -azP ~/code jgibbons@jgibbons-ld1:~' #not really using anymore
+# alias work='watch.sh' #not really using anymore
+
+# Git
+alias gs='git status'
 alias grc='git review create --no-prompt --owners --open'
-alias syncup='rsync -azP ~/code jgibbons@jgibbons-ld1:~' #not really using anymore
-alias work='watch.sh' #not really using anymore
+alias gca='git commit --amend --no-edit'
+alias push_it='git add -A && gca'
+git_review_update() {
+  update_commit.sh "$1" && git review update -r "$1"
+}
+git_parent_review_update() {
+  git review update -r "$1" --parent="$2"
+}
+ghp() {
+  set -e
+  if [[ -z "$1" ]]; then
+    read -p "Enter Commit Message: " commit_message
+  else
+    commit_message=$1
+  fi
+  git add -A && git commit -m commit_message && git push
+}
+alias validate_review='git review status --verify-diff'
+
+# SSH
 alias linux='ssh jgibbons-ld1'
+alias connect='ssh jgibbons-ld1'
+
+# Zsh/Bash
+alias bash_reload='. ~/.bash_profile'
+alias bash_profile='code ~/.bash_profile'
+alias zsh_reload='exec zsh'
+alias zshconfig='code ~/.zshrc'
+alias gitconfig='code ~/.gitconfig'
+kill_all_grep() {
+  kill $(ps aux | grep "$1" | awk '{print $2}')
+}
+kill_port() {
+  kill $(lsof -t -i :"$1")
+}
+kill_hard_port() {
+  kill -kill $(lsof -t -i :"$1")
+}
+
+# tscp-admin-frontend
 alias testp='chmod -R +x ~/code/tscp-admin-frontend_trunk/tscp-admin-frontend/target/sc-temp/public/lebowski/dust-compiler/'
 alias mup='mint update && mint clean && testp'
 alias unit_test='mint test-js-units'
 alias diff_test='mint test-testem-diff'
 alias clean_sync='git clean -fd'
 alias jsbuild='ligradle jsBuild'
-alias gca='git commit --amend --no-edit'
-alias bash_reload='. ~/.bash_profile'
-alias push_it='git add -A && gca'
-alias connect='ssh jgibbons-ld1'
 alias run_stubs='ligradle clean test -DquitChrome=true'
-alias ember_log='tail -f logs/serve.log'
-alias serve_mirage='USE_MIRAGE=true just serve'
-alias ember_test_all='just yarn run test | tee output.txt && sed -n "/not ok/,/\.\.\./p" output.txt && rm -rf output.txt'
-alias ember_test_browser='just ember exam --server'
-alias mint_update='mint update && just init --clean'
-alias api_debug='ligradle -Pdebug=true runPlayBinary -t'
-alias run_api='ligradle runPlayBinary -t'
-alias test_api='ligradle testPlayBinary -t'
-alias int_test_api='ligradle iTestPlayBinary'
-alias cd_api='cd ~/code/campaign-manager-api_trunk'
-alias cd_web='cd ~/code/campaign-manager-web_trunk'
-alias bash_profile='vim ~/.bash_profile'
-alias reload='exec zsh'
-alias zshconfig='vim ~/.zshrc'
-alias gitconfig='vim ~/.gitconfig'
-
 mtestem() {
   testp && just npm run testem spec "$1"
 }
@@ -142,18 +170,120 @@ mtestemprint() {
   testp && just npm run testem ci spec "$1"
 }
 
+# Campaign Manager API
+alias api_debug='ligradle -Pdebug=true runPlayBinary -t'
+alias api_run='ligradle runPlayBinary'
+alias api_test='ligradle testPlayBinary --rerun-tasks'
+alias api_test_int='ligradle iTestPlayBinary'
+alias api_rebuild='ligradle -Prest.model.compatibility=ignore build'
+alias api_update='ligradle clean && ligradle idea && ligradle build'
+alias cd_api='cd ~/code/campaign-manager-api_trunk'
+ati() {
+  ligradle iTestPlayBinary --tests *"$1" class
+}
+
+# Campaign Manger Web
+alias cd_web='cd ~/code/campaign-manager-web_trunk'
+alias ember_test_all='just yarn run test | tee output.txt && sed -n "/not ok/,/\.\.\./p" output.txt && rm -rf output.txt'
+alias ember_test_browser='just ember exam --server'
+alias ember_log='tail -f logs/serve.log'
+alias serve_mirage='USE_MIRAGE=true just ember serve'
+alias mint_update='mint update && just init --clean'
+alias ember_reset='rm -rf tmp/ build/ && just init --clean'
+alias docs_open='open build/reports/apidoc/html/index.html'
+alias docs_build='mint apidoc'
+
+alias ingraphs_checkout='ingraphs dashboard checkout'
+
+web_run() {
+  just ember serve
+}
+
+web_run_port() {
+  just ember serve --port "$1"
+}
+eto() {
+  just ember exam --server --filter=":ONLY"
+}
 etf() {
   just ember exam --server --filter="$1"
 }
-
 etm() {
   just ember exam --server --module="$1"
 }
-
-git_review_update() {
-  update_commit.sh "$1" && git review update -r "$1"
+etml() {
+  just ember exam --module="$1"
 }
-export PATH="/usr/local/opt/openssl/bin:$PATH"
+get_screenshots() {
+  just ember build --screenshot --environment test && just ember jstf --path dist --launch jstf_firefox_52.0 --preset desktop_1920_1080 --locale "$1"
+}
+esm() {
+  just ember jstf --path dist --launch jstf_firefox_52.0 --preset desktop_1920_1080 --module "$1" --locale "$2"
+}
+esmb() {
+  just ember build --screenshot --environment test && just ember jstf --path dist --launch jstf_firefox_52.0 --preset desktop_1920_1080 --module "$1" --locale "$2"
+}
+wc_test() {
+  mint wc-test -d "$1"
+}
 
-source "$HOME/.homesick/repos/homeshick/homeshick.sh"
-homeshick --quiet refresh
+# Voyager Web
+alias qprod_setup_ei="qdt --target ei deployment add -a voyager-web -p 4443 --host jgibbons-mn2.linkedin.biz --scheme https"
+alias qprod_setup_prod="qdt --target prod deployment add -a voyager-web -p 4443 --host jgibbons-mn2.linkedin.biz --scheme https"
+alias qprod_get_id="qdt --target prod deployment list -u jgibbons"
+qprod_use_ip_ei() {
+  qdt --target ei deployment update -i "$1" --use_my_ip
+}
+qprod_use_ip_ei() {
+  qdt --target prod deployment update -i "$1" --use_my_ip
+}
+alias voyager_start_ei_qprod="FABRIC=qdtei-lca1 just ember s"
+alias voyager_start_prod_qprod="FABRIC=qdtprod-lva1 just ember s"
+alias voyager_start_local="just ember serve --app=extended"
+
+# Personal Notes
+alias cd_notes='cd ~/code/personal_notes'
+
+# Codesearch
+search_web() {
+  cs "$1" mp:campaign-manager-web
+}
+
+search_api() {
+  cs "$1" mp:campaign-manager-api
+}
+
+search_taf() {
+  cs "$1" mp:tscp-admin-frontend
+}
+
+search_ads() {
+  cs "$1" mp:campaign-manager-web mp:campaign-manager-api mp:tscp-admin-frontend mp:tscp-api
+}
+
+# LI cookie for nserwn@li.com/password
+li_at=AQEDAw2QnYEEdxIIAAABaM6bC_wAAAFo3wHLNVQAgwQNzzXLCKrnn9zJDCfPTZl9PESnwHrmJ9cwvZWDp-0mzTYIwZRy8LaX2Mcl3EcC57P9DEpq7r0hOCtPZvIVHOEt-2neA9hswVRvY-emDOuasBz-
+
+# Curli
+function restli() {
+  curli -H 'Authenticate: X-RestLI SUPERUSER:urn:li:system:3038986662'  --dv-auth SELF --logging-level ERROR --pretty-print  -H "X-RestLi-Protocol-Version: 2.0.0" -H "Accept: application/json" "$@"
+}
+
+function restli_get() {
+  restli "$@"
+}
+
+# input from stdin
+function restli_post() {
+  restli -d @- -X POST "$@"
+}
+
+# input from stdin, patch wrapper already present
+function restli_patch() {
+  jq '{patch: .}' | restli_post -H "X-RestLi-Method: partial_update" "$@"
+}
+
+# input from stdin, patch wrapper already present
+function restli_batch_patch() {
+  jq '{patch .}' | restli_post -H "X-RestLi-Method: batch_partial_update" "$@"
+}

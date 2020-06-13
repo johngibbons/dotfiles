@@ -1,5 +1,5 @@
 [core]
-	editor = /usr/bin/vim
+	editor = vim
 [user]
 	email = jgibbons@linkedin.com
 	name = John Gibbons
@@ -24,8 +24,9 @@ default = upstream
 
   git = !exec git
   cb = "!f() { git checkout -b "$1" && git branch -u origin/master; }; f"
-  cbi = "!f() { git checkout -b "$1" && git branch -u origin/master; && just init --clean; }; f"
-  submitrb = "!f() { git review dcommit -r "$1" && git submit --async; }; f"
+  cbi = "!f() { git checkout -b "$1" && git branch -u origin/master && just init --clean; }; f"
+  submitrb = "!f() { update_commit.sh "$1" && git review dcommit -r "$1" && git submit --async; }; f"
+  emptycommit = "!f() { git commit --allow-empty -m "$1" && git submit --async }; f"
 
   # git amend <rb_id>
   # note this is probably useful for atomic bug fix and not huge features
@@ -37,3 +38,11 @@ default = upstream
   # git finalize <rb_id>
   # updates your master to latest, decorates the commit and tries to push
   finalize = "!f() { npm run lint && mint update && git review dcommit -r "$1" && git submit --async; }; f"
+
+  prettylog = "log --oneline --decorate --all --graph"
+  hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+  unstage = "reset HEAD --"
+[pager]
+	branch = false
+[rerere]
+	enabled = true
