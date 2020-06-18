@@ -287,3 +287,5 @@ function restli_patch() {
 function restli_batch_patch() {
   jq '{patch .}' | restli_post -H "X-RestLi-Method: batch_partial_update" "$@"
 }
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
