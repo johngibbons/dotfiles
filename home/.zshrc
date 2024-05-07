@@ -163,11 +163,11 @@ alias clean_sync='git clean -fd'
 alias jsbuild='ligradle jsBuild'
 alias run_stubs='ligradle clean test -DquitChrome=true'
 mtestem() {
-  testp && just npm run testem spec "$1"
+  testp && npm run testem spec "$1"
 }
 
 mtestemprint() {
-  testp && just npm run testem ci spec "$1"
+  testp && npm run testem ci spec "$1"
 }
 
 # Campaign Manager API
@@ -184,44 +184,44 @@ ati() {
 
 # Campaign Manger Web
 alias cd_web='cd ~/code/campaign-manager-web_trunk'
-alias ember_test_all='just yarn run test | tee output.txt && sed -n "/not ok/,/\.\.\./p" output.txt && rm -rf output.txt'
-alias ember_test_browser='just ember exam --server'
+alias ember_test_all='yarn run test | tee output.txt && sed -n "/not ok/,/\.\.\./p" output.txt && rm -rf output.txt'
+alias ember_test_browser='ember exam --server'
 alias ember_log='tail -f logs/serve.log'
-alias serve_mirage='USE_MIRAGE=true just ember serve'
-alias mint_update='mint update && just init --clean'
-alias ember_reset='rm -rf tmp/ build/ && just init --clean'
+alias serve_mirage='USE_MIRAGE=true ember serve'
+alias mint_update='mint update && init --clean'
+alias ember_reset='rm -rf tmp/ build/ && init --clean'
 alias docs_open='open build/reports/apidoc/html/index.html'
 alias docs_build='mint apidoc'
 
 alias ingraphs_checkout='ingraphs dashboard checkout'
 
 web_run() {
-  just ember serve
+  ember serve
 }
 
 web_run_port() {
-  just ember serve --port "$1"
+  ember serve --port "$1"
 }
 eto() {
-  just ember exam --server --filter=":ONLY"
+  ember exam --server --filter=":ONLY"
 }
 etf() {
-  just ember exam --server --filter="$1"
+  ember exam --server --filter="$1"
 }
 etm() {
-  just ember exam --server --module="$1"
+  ember exam --server --module="$1"
 }
 etml() {
-  just ember exam --module="$1"
+  ember exam --module="$1"
 }
 get_screenshots() {
-  just ember build --screenshot --environment test && just ember jstf --path dist --launch jstf_firefox_52.0 --preset desktop_1920_1080 --locale "$1"
+  ember build --screenshot --environment test && ember jstf --path dist --launch jstf_firefox_52.0 --preset desktop_1920_1080 --locale "$1"
 }
 esm() {
-  just ember jstf --path dist --launch jstf_firefox_52.0 --preset desktop_1920_1080 --module "$1" --locale "$2"
+  ember jstf --path dist --launch jstf_firefox_52.0 --preset desktop_1920_1080 --module "$1" --locale "$2"
 }
 esmb() {
-  just ember build --screenshot --environment test && just ember jstf --path dist --launch jstf_firefox_52.0 --preset desktop_1920_1080 --module "$1" --locale "$2"
+  ember build --screenshot --environment test && ember jstf --path dist --launch jstf_firefox_52.0 --preset desktop_1920_1080 --module "$1" --locale "$2"
 }
 wc_test() {
   mint wc-test -d "$1"
@@ -237,9 +237,9 @@ qprod_use_ip_ei() {
 qprod_use_ip_ei() {
   qdt --target prod deployment update -i "$1" --use_my_ip
 }
-alias voyager_start_ei_qprod="FABRIC=qdtei-lca1 just ember s"
-alias voyager_start_prod_qprod="FABRIC=qdtprod-lva1 just ember s"
-alias voyager_start_local="just ember serve --app=extended"
+alias voyager_start_ei_qprod="FABRIC=qdtei-lca1 ember s"
+alias voyager_start_prod_qprod="FABRIC=qdtprod-lva1 ember s"
+alias voyager_start_local="ember serve --app=extended"
 
 # Personal Notes
 alias cd_notes='cd ~/code/personal_notes'
